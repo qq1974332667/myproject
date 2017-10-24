@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yihaomen.mybatis.inter.IUserOperation">
+    <select id="selectUserByID" parameterType="int" resultType="User">
+        select * from `user` where id = #{id}
+    </select>
+
+    <select id="selectUsers" parameterType="string" resultMap="resultListUser">
+        select * from user where userName like #{userName}
+    </select>
+
+    <resultMap type="User" id="resultListUser">
+        <id column="id" property="id" />
+        <result column="userName" property="userName" />
+        <result column="userAge" property="userAge" />
+        <result column="userAddress" property="userAddress" />
+    </resultMap>
+
+    <insert id="insertUser" parameterType="User"  useGeneratedKeys="true" keyProperty="id">
+        insert into USER (userName, userAge, userAddress) VALUE (#{userName}, #{userAge}, #{userAddress})
+    </insert>
+
+    <update id="updateUser" parameterType="User">
+        update User set userName=#{userName},userAge=#{userAge} where id=#{id}
+    </update>
+    <delete id="deleteUser" parameterType="User">
+        delete from User WHERE id=#{id}
+    </delete>
+
+
+
+    <resultMap id="resultUserArticleList" type="Article">
+        <id property="id" column="aid" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+
+        <association property="user" javaType="User">
+            <id property="id" column="id" />
+            <result property="userName" column="userName" />
+            <result property="userAddress" column="userAddress" />
+        </association>
+    </resultMap>
+    <!--<select id="getUserArticles" parameterType="int" resultMap="resultUserArticleList">-->
+        <!--select-->
+        <!--user.id,user.userName,user.userAddress,-->
+        <!--article.id aid,article.title,article.content-->
+        <!--from user,article-->
+        <!--where user.id=article.userid and user.id=#{id}-->
+    <!--</select>-->
+
+
+
+
+    <!-- User 联合文章进行查询 方法之二的配置 (多对一的方式) -->
+    <resultMap id="resultUserArticleList-2" type="Article">
+        <id property="id" column="aid" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <association property="user" javaType="User" resultMap="resultListUser" />
+    </resultMap>
+
+    <select id="getUserArticles" parameterType="int" resultMap="resultUserArticleList">
+        select user.id,user.userName,user.userAddress,article.id aid,article.title,article.content from user,article
+        where user.id=article.userid and user.id=#{id}
+    </select>
+</mapper>
+
+
+
